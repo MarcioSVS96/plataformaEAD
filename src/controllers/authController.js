@@ -10,6 +10,7 @@ const generateToken = (user) => {
 }
 
 const register = async (req, res) => {
+  console.log("Dados recebidos no register:", req.body)
   try {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
