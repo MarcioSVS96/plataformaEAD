@@ -1,120 +1,50 @@
-import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const navigate = useNavigate()
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setError("")
-    setSuccess("")
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // Simulação de cadastro
-    if (email && password.length >= 6) {
-      setSuccess("Cadastro realizado com sucesso!")
-      setTimeout(() => {
-        navigate("/")
-      }, 1500)
-    } else {
-      setError("Senha deve ter pelo menos 6 caracteres.")
+    try {
+      const response = await fetch("http://localhost:3001/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Registro feito com sucesso, agora redireciona para login
+        alert("Registro realizado com sucesso! Faça login para continuar.");
+        navigate("/"); // Redireciona para a tela de login
+      } else {
+        console.error("Erro ao registrar:", data.message);
+        alert("Erro ao registrar: " + data.message);
+      }
+    } catch (err) {
+      console.error("Erro ao registrar:", err);
+      alert("Erro inesperado ao registrar.");
     }
-  }
+  };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Crie sua conta</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          style={styles.input}
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          autoComplete="username"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          style={styles.input}
-          type="password"
-          placeholder="Senha (mínimo 6 caracteres)"
-          value={password}
-          autoComplete="new-password"
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-        />
-        <button style={styles.button} type="submit">
-          Registrar
-        </button>
-      </form>
-      {error && <p style={styles.error}>{error}</p>}
-      {success && <p style={styles.success}>{success}</p>}
-      <p style={styles.text}>
-        Já tem conta?{" "}
-        <Link to="/" style={styles.link}>
-          Faça login
-        </Link>
-      </p>
-    </div>
-  )
-}
-
-const styles = {
-  container: {
-    maxWidth: 400,
-    margin: "60px auto",
-    padding: 20,
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-    borderRadius: 8,
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    textAlign: "center",
-  },
-  title: {
-    marginBottom: 24,
-    color: "#333",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 15,
-  },
-  input: {
-    padding: 12,
-    fontSize: 16,
-    borderRadius: 4,
-    border: "1px solid #ccc",
-    outline: "none",
-  },
-  button: {
-    padding: 12,
-    fontSize: 16,
-    borderRadius: 4,
-    border: "none",
-    backgroundColor: "#28a745",
-    color: "white",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
-  error: {
-    marginTop: 12,
-    color: "red",
-  },
-  success: {
-    marginTop: 12,
-    color: "green",
-  },
-  text: {
-    marginTop: 20,
-    color: "#555",
-  },
-  link: {
-    color: "#28a745",
-    textDecoration: "none",
-    fontWeight: "bold",
-  },
+    <form onSubmit={handleSubmit}>
+      <input name="name" placeholder="Nome" onChange={handleChange} required />
+      <input name="email" placeholder="Email" onChange={handleChange} required />
+      <input name="password" type="password" placeholder="Senha" onChange={handleChange} required />
+      <button type="submit">Registrar</button>
+    </form>
+  );
 }

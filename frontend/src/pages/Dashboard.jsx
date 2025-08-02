@@ -12,7 +12,7 @@ export default function Dashboard() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Bem-vindo, {user?.email}</h2>
+      <h2 style={styles.title}>Bem-vindo, {user?.name || user?.email || "Usuário"}</h2>
       <button style={styles.button} onClick={handleLogout}>
         Sair
       </button>
